@@ -5,7 +5,7 @@
     "build": "rollup -c"
   },
   "devDependencies": {
-    "prettier": "0.0.4",
+    "prettier": "0.0.5",
     "rollup": "^0.41.1",
     "rollup-plugin-commonjs": "^7.0.0",
     "rollup-plugin-node-builtins": "^2.0.0",
