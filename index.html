@@ -7,34 +7,56 @@
 <script src="https://codemirror.net/addon/display/rulers.js"></script>
 
 <style type="text/css">
-  .editors {
-    display: flex;
-    flex-direction: row;
-    flex: 1;
+  html, body {
+    font-family: "Helvetica Neue", "Open Sans", sans-serif;
+    font-size: 11.7px;
+    margin: 0;
+    padding: 0;
+    background-color: #444444;
+    color: #e2e1e1;
   }
-  .editor {
-    display: flex;
-    flex: 1;
-    overflow: scroll;
-    border: 1px solid black;
-  }
-  .CodeMirror {
-    width: 100%;
-    height: 100%;
-  }
-  .editor.output .CodeMirror {
-    background-color: #eee;
-  }
-  .editor.input {
-    margin-right: 5px;
+  .title {
+    font-style: italic;
+    line-height: 19px;
+    margin-right: 10px;
   }
   .container {
     display: flex;
     flex-direction: column;
     height: 100%;
   }
+  .editors {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    margin: 5px;
+  }
+  .editor {
+    display: flex;
+    flex: 1;
+    position: relative;
+  }
+  .CodeMirror {
+    height: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-family: Menlo, monospace;
+    font-size: 11.05px;
+    line-height: 17.68px;
+  }
+  .editor.output .CodeMirror {
+    background-color: #fdfcfc;
+  }
+  .editor.input {
+    margin-right: 5px;
+  }
   .options {
     display: flex;
+    margin: 5px;
+    margin-bottom: 0;
   }
   label {
     margin-right: 5px;
@@ -45,6 +67,15 @@
 </style>
 
 <div class="container">
+  <div class="options">
+    <label class="title">prettier v0.0.5</label>
+    <label><input type="number" value="80" id="printWidth"></input> printWidth</label>
+    <label><input type="number" value="2" id="tabWidth"></input> tabWidth</label>
+    <label><input type="checkbox" id="singleQuote"></input> singleQuote</label>
+    <label><input type="checkbox" id="trailingComma"></input> trailingComma</label>
+    <label><input type="checkbox" id="bracketSpacing" checked></input> bracketSpacing</label>
+  </div>
+
   <div class="editors">
     <div class="editor input">
       <textarea id="input"></textarea>
@@ -53,20 +84,10 @@
       <textarea id="output"></textarea>
     </div>
   </div>
-
-  <div class="options">
-    <label>prettier v0.0.5</label>
-    <label><input type="number" value="80" id="printWidth"></input> printWidth</label>
-    <label><input type="number" value="2" id="tabWidth"></input> tabWidth</label>
-    <label><input type="checkbox" id="useFlowParser"></input> useFlowParser</label>
-    <label><input type="checkbox" id="singleQuote"></input> singleQuote</label>
-    <label><input type="checkbox" id="trailingComma"></input> trailingComma</label>
-    <label><input type="checkbox" id="bracketSpacing"></input> bracketSpacing</label>
-  </div>
 </div>
 
 <script id="code">
-var OPTIONS = ['printWidth', 'tabWidth', 'useFlowParser', 'singleQuote', 'trailingComma', 'bracketSpacing'];
+var OPTIONS = ['printWidth', 'tabWidth', 'singleQuote', 'trailingComma', 'bracketSpacing'];
 function setOptions(options) {
   OPTIONS.forEach(function(option) {
     var elem = document.getElementById(option);
@@ -89,7 +110,7 @@ function getOptions() {
 
 function format() {
   var options = getOptions();
-  outputEditor.setOption('rulers', [{column: options.printWidth}]);
+  outputEditor.setOption('rulers', [{column: options.printWidth, color: '#444444'}]);
   var value = encodeURIComponent(
     JSON.stringify(
       Object.assign({content: inputEditor.getValue(), options: options})
