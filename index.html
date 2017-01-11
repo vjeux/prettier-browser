@@ -4,56 +4,119 @@
 <link rel="stylesheet" href="https://codemirror.net/lib/codemirror.css">
 <script src="https://codemirror.net/lib/codemirror.js"></script>
 <script src="https://codemirror.net/mode/javascript/javascript.js"></script>
+<script src="https://codemirror.net/addon/display/rulers.js"></script>
 
 <style type="text/css">
-  .container {
+  .editors {
     display: flex;
     flex-direction: row;
+    flex: 1;
   }
   .editor {
     display: flex;
     flex: 1;
+    overflow: scroll;
     border: 1px solid black;
-    margin: 0 5px;
   }
   .CodeMirror {
-    height: 100%;
     width: 100%;
+    height: 100%;
   }
-  .output .CodeMirror {
+  .editor.output .CodeMirror {
     background-color: #eee;
+  }
+  .editor.input {
+    margin-right: 5px;
+  }
+  .container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .options {
+    display: flex;
+  }
+  label {
+    margin-right: 5px;
+  }
+  input[type="number"] {
+    max-width: 40px;
   }
 </style>
 
 <div class="container">
-  <div class="editor">
-    <textarea id="input"></textarea>
+  <div class="editors">
+    <div class="editor input">
+      <textarea id="input"></textarea>
+    </div>
+    <div class="editor output">
+      <textarea id="output"></textarea>
+    </div>
   </div>
-  <div class="editor output">
-    <textarea id="output"></textarea>
+
+  <div class="options">
+    <label><input type="number" value="80" id="printWidth"></input> printWidth</label>
+    <label><input type="number" value="2" id="tabWidth"></input> tabWidth</label>
+    <label><input type="checkbox" id="useFlowParser"></input> useFlowParser</label>
+    <label><input type="checkbox" id="singleQuote"></input> singleQuote</label>
+    <label><input type="checkbox" id="trailingComma"></input> trailingComma</label>
+    <label><input type="checkbox" id="bracketSpacing"></input> bracketSpacing</label>
   </div>
 </div>
 
 <script id="code">
-var inputEditor = CodeMirror.fromTextArea(input);
-inputEditor.on('change', function(editor) {
-  var value = encodeURIComponent(editor.getValue());
+var OPTIONS = ['printWidth', 'tabWidth', 'useFlowParser', 'singleQuote', 'trailingComma', 'bracketSpacing'];
+function setOptions(options) {
+  OPTIONS.forEach(function(option) {
+    var elem = document.getElementById(option);
+    if (elem.type === 'number') {
+      elem.value = options[option];
+    } else {
+      elem.checked = options[option];
+    }
+  });
+}
+
+function getOptions() {
+  var options = {};
+  OPTIONS.forEach(function(option) {
+    var elem = document.getElementById(option);
+    options[option] = elem.type === 'number' ? +elem.value : elem.checked;
+  });
+  return options;
+}
+
+function format() {
+  var options = getOptions();
+  outputEditor.setOption('rulers', [{column: options.printWidth}]);
+  var value = encodeURIComponent(
+    JSON.stringify(
+      Object.assign({content: inputEditor.getValue(), options: options})
+    )
+  );
   location.hash = value;
   var res;
   try {
-    res = prettier.format(editor.getValue());
+    res = prettier.format(inputEditor.getValue(), options);
   } catch (e) {
     res = e.toString();
   }
   outputEditor.setValue(res);
-});
+}
+
+document.getElementsByClassName('options')[0].onchange = format;
+
+var inputEditor = CodeMirror.fromTextArea(input);
+inputEditor.on('change', format);
 var outputEditor = CodeMirror.fromTextArea(output, {readOnly: true});
 </script>
 
 <script>
-if (location.hash) {
-  inputEditor.setValue(decodeURIComponent(location.hash.slice(1)));
-} else {
-  inputEditor.setValue(code.innerText.trim());
+try {
+  var json = JSON.parse(decodeURIComponent(location.hash.slice(1)));
+  setOptions(json.options);
+  inputEditor.setValue(json.content);
+} catch (e) {
+  inputEditor.setValue(code.innerText.trim());  
 }
 </script>
