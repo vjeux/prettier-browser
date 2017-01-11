@@ -36,7 +36,9 @@
 
 <script id="code">
 var inputEditor = CodeMirror.fromTextArea(input);
-inputEditor.on('change', function (editor) {
+inputEditor.on('change', function(editor) {
+  var value = encodeURIComponent(editor.getValue());
+  location.hash = value;
   var res;
   try {
     res = prettier.format(editor.getValue());
@@ -49,5 +51,9 @@ var outputEditor = CodeMirror.fromTextArea(output, {readOnly: true});
 </script>
 
 <script>
-inputEditor.setValue(code.innerText.trim());
+if (location.hash) {
+  inputEditor.setValue(decodeURIComponent(location.hash.slice(1)));
+} else {
+  inputEditor.setValue(code.innerText.trim());
+}
 </script>
