@@ -1,0 +1,53 @@
+<script>global = window;</script>
+<script src="prettier.min.js"></script>
+
+<link rel="stylesheet" href="https://codemirror.net/lib/codemirror.css">
+<script src="https://codemirror.net/lib/codemirror.js"></script>
+<script src="https://codemirror.net/mode/javascript/javascript.js"></script>
+
+<style type="text/css">
+  .container {
+    display: flex;
+    flex-direction: row;
+  }
+  .editor {
+    display: flex;
+    flex: 1;
+    border: 1px solid black;
+    margin: 0 5px;
+  }
+  .CodeMirror {
+    height: 100%;
+    width: 100%;
+  }
+  .output .CodeMirror {
+    background-color: #eee;
+  }
+</style>
+
+<div class="container">
+  <div class="editor">
+    <textarea id="input"></textarea>
+  </div>
+  <div class="editor output">
+    <textarea id="output"></textarea>
+  </div>
+</div>
+
+<script id="code">
+var inputEditor = CodeMirror.fromTextArea(input);
+inputEditor.on('change', function (editor) {
+  var res;
+  try {
+    res = prettier.format(editor.getValue());
+  } catch (e) {
+    res = e.toString();
+  }
+  outputEditor.setValue(res);
+});
+var outputEditor = CodeMirror.fromTextArea(output, {readOnly: true});
+</script>
+
+<script>
+inputEditor.setValue(code.innerText.trim());
+</script>
