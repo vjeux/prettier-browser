@@ -1,8 +1,11 @@
 {
   "name": "prettier-browser",
   "version": "0.0.0",
+  "scripts": {
+    "build": "rollup -c"
+  },
   "devDependencies": {
-    "prettier": "0.0.3",
+    "prettier": "0.0.4",
     "rollup": "^0.41.1",
     "rollup-plugin-commonjs": "^7.0.0",
     "rollup-plugin-node-builtins": "^2.0.0",
